@@ -32,7 +32,10 @@
   let account = ref("");
   let transactionNo = ref("");
 
-  let handlerDateInput = function (event){
+  // function handlerDateInput(){}
+  // const handlerDateInput = ()=>{}
+
+  const handlerDateInput = function (event){
     clearTimeout(this.errorTimeout);
     let dateInputValue = event.target.value;
     //若輸入的不是數字就不處理
