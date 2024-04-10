@@ -1,8 +1,9 @@
 <script setup>
 //Form POST 至 https://uat-fps.ctbcins.com/ap2ap/remit
   import {ref, computed} from 'vue';
+  import debounce from 'lodash/debounce';
 
-  let content = ref({
+  const content = ref({
     accountNoReceive:"163540120484",
     accountType:"2",
     accountDate:"1130205",  //日期
@@ -26,68 +27,47 @@
     remittanceMemo: "                                                                                "  //80bytes   
   });
 
-  let date = ref("");
-  let time = ref("");
-  let amount = ref("");
-  let account = ref("");
-  let transactionNo = ref("");
+  const date = ref("");
+  const time = ref("");
+  const amount = ref("");
+  const account = ref("");
+  const transactionNo = ref("");
 
-  // function handlerDateInput(){}
-  // const handlerDateInput = ()=>{}
-
-  const handlerDateInput = function (event){
-    clearTimeout(this.errorTimeout);
-    let dateInputValue = event.target.value;
-    //若輸入的不是數字就不處理
-    if (!/^\d*$/.test(dateInputValue)) {
+  const handlerDateInput = debounce(function (event){
+    const dateInputValue = event.target.value;
+    if (!/^\d*$/.test(dateInputValue)) {  //若輸入的不是數字就不處理
       event.target.value = "";
       return;
     } 
     if (dateInputValue.length > 7) {
-      this.setErrorTimeout(() => {
-        alert('日期格式錯誤，最多為七位數字，且必須符合民國(年月日)的格式');
-      });
+      alert('日期格式錯誤，最多為七位數字，且必須符合民國(年月日)的格式');
       return;
     }
     if (dateInputValue.length === 7) {
       const year = parseInt(dateInputValue.substring(0, 3));
       const month = parseInt(dateInputValue.substring(3, 5));
       const day = parseInt(dateInputValue.substring(5, 7));
+      const daysInMonth = new Date(year + 1911, month, 0).getDate();
       if (
         year < 1 || year > 999 ||
         month < 1 || month > 12||
-        day < 1 || day > 31
+        day < 1 || day > daysInMonth ||
+        (month === 2 && day > 29 && (year % 4 === 0 && (year % 100 !== 0 || year % 400 ===0)))
       ){
-        this.setErrorTimeout(() => {
-          alert('日期格式錯誤，必須符合民國年月日');
-        });
+        alert('日期格式錯誤，必須符合民國年月日');
         return;
       }
-      // const daysInMonth = new Date( year + 1911, month, 0).getDate();
-      // if (day > daysInMonth){
-      //   alert('日期格式必須為民國年月日');
-      //   event.target.value = "";
-      //   return;
-      // }
     }
-  }
-
-  let setErrorTimeout = function(callback) {
-    this.errorTimeout = setTimeout(callback, 1000);
-  }
-
-  let handlerTimeInput = function (event){
-    clearTimeout(this.errorTimeout);
-    let timeInputValue = event.target.value;
-    //若輸入的不是數字就不處理
-    if (!/^\d*$/.test(timeInputValue)) {
+  }, 1000);
+  
+  const handlerTimeInput = debounce(function (event){
+    const timeInputValue = event.target.value;
+    if (!/^\d*$/.test(timeInputValue)) {  //若輸入的不是數字就不處理
       event.target.value = "";
       return;
     }
     if (timeInputValue.length > 6) {
-      this.setErrorTimeout(() => {
-        alert('時間格式錯誤，最多為六位數字，且必須符合24小時制(時分秒)的格式');
-      });
+      alert('時間格式錯誤，最多為六位數字，且必須符合24小時制(時分秒)的格式');
       return;
     }
     if (timeInputValue.length === 6){
@@ -95,75 +75,61 @@
       const minute = parseInt(timeInputValue.substring(2, 4));
       const second = parseInt(timeInputValue.substring(4, 6));
       if (
-        hour < 1 || hour > 23 ||
-        minute < 1 || minute > 59 ||
-        second < 1 || second > 59 
+        hour < 0 || hour > 23 ||
+        minute < 0 || minute > 59 ||
+        second < 0 || second > 59 
       ){
-        this.setErrorTimeout(() => {
-          alert('時間格式錯誤，必須符合(24小時制)時分秒');
-        });
+        alert('時間格式錯誤，必須符合(24小時制)時分秒');
         return;
       }
     }
-  }
+  }, 1000);
 
-  let handlerAmountInput = function (event){
-    clearTimeout(this.errorTimeout);
-    let amountInputValue = event.target.value;
-    //若輸入的不是數字就不處理
-    if (!/^\d*$/.test(amountInputValue)) {
+  const handlerAmountInput = debounce(function (event){
+    const amountInputValue = event.target.value;
+    if (!/^\d*$/.test(amountInputValue)) {  //若輸入的不是數字就不處理
       event.target.value = "";
       return;
     }
     if (amountInputValue.length > 15){
-      this.setErrorTimeout(() => {
-        alert('超過轉帳金額上限');
-      });
+      alert('超過轉帳金額上限');
       return;
     }
-  }
+  }, 1000);
 
-  let handlerAccountInput = function (event){
-    clearTimeout(this.errorTimeout);
-    let accountInputValue = event.target.value;
-    //若輸入的不是數字就不處理
-    if (!/^\d*$/.test(accountInputValue)) {
+  const handlerAccountInput = debounce(function (event){
+    const accountInputValue = event.target.value;
+    if (!/^\d*$/.test(accountInputValue)) {  //若輸入的不是數字就不處理
       event.target.value = "";
       return;
     }
     if (accountInputValue.length > 14){
-      this.setErrorTimeout(() => {
-        alert('轉帳帳號格式錯誤，輸入之前五碼需為企業識別碼，後九碼需為虛擬繳款帳號')
-      });
+      alert('轉帳帳號格式錯誤，輸入之前五碼需為企業識別碼，後九碼需為虛擬繳款帳號')
       return;
     }
-  }
+  }, 1000);
 
-  let handlerTransactionNoInput = function (event){
-    clearTimeout(this.errorTimeout);
-    let transactionNoInputValue = event.target.value;
-    //若輸入的不是數字就不處理
-    if (!/^\d*$/.test(transactionNoInputValue)) {
+  const handlerTransactionNoInput = debounce(function (event){
+    const transactionNoInputValue = event.target.value;
+    if (!/^\d*$/.test(transactionNoInputValue)) {  //若輸入的不是數字就不處理
       event.target.value = "";
       return;
     }
     if (transactionNoInputValue.length > 17) {
-      this.setErrorTimeout(() => {
-        alert('交易編號格式錯誤，最多為十七位數字');
-      });
+      alert('交易編號格式錯誤，最多為十七位數字');
       return;
     }
-  }
+  }, 1000);
 
-  let companyCodeMemo1 = computed(() => {
-    let accountValue = account.value || "";
+  const companyCodeMemo1 = computed(() => {
+    const accountValue = account.value || "";
     return {
       companyCode: accountValue.substring(0, 5),
       memo1: accountValue.substring(5)
     };
   });
 
-  let concatenateData = function() {
+  const concatenateData = function() {
     content.value.transactionDate = date.value;
     content.value.transactionTime = time.value;
     content.value.transactionAmount = amount.value.padStart(15, '0');
@@ -172,7 +138,7 @@
 
     console.log(content.value);
 
-    let keysInOrder = [
+    const keysInOrder = [
       'accountNoReceive',
       'accountType',
       'accountDate',
@@ -205,24 +171,26 @@
     sendData(concatenatedData);
   }
 
-  let sendData = function(concatenatedData) {
+  const sendData = function(concatenatedData) {
     if (!date.value) {
       alert('日期欄位為必填');
       return;
     }
     const dateValue = parseInt(date.value);
     if (isNaN(dateValue) || date.value.length !== 7) {
-      alert('日期格式錯誤，最多為七位數字，且必須符合民國(年月日)的格式');
+      alert('日期格式錯誤，需為七位數字，且必須符合民國(年月日)的格式');
       return;
     }
     if (date.value.length === 7) {
       const year = parseInt(date.value.substring(0, 3));
       const month = parseInt(date.value.substring(3, 5));
       const day = parseInt(date.value.substring(5, 7));
+      const daysInMonth = new Date(year + 1911, month, 0).getDate();
       if (
         year < 1 || year > 999 ||
         month < 1 || month > 12||
-        day < 1 || day > 31
+        day < 1 || day > daysInMonth ||
+        (month === 2 && day > 29 && (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)))
       ){
         alert('日期格式錯誤，必須符合(民國)年月日');
         return;
@@ -235,7 +203,7 @@
     }
     const timeValue = parseInt(time.value);
     if (isNaN(timeValue) || time.value.length !== 6) {
-      alert('時間格式錯誤，最多為六位數字，且必須符合24小時制(時分秒)的格式');
+      alert('時間格式錯誤，需為六位數字，且必須符合24小時制(時分秒)的格式');
       return;
     }
     if (time.value.length === 6){
@@ -243,9 +211,9 @@
       const minute = parseInt(time.value.substring(2, 4));
       const second = parseInt(time.value.substring(4, 6));
       if (
-        hour < 1 || hour > 23 ||
-        minute < 1 || minute > 59 ||
-        second < 1 || second > 59 
+        hour < 0 || hour > 23 ||
+        minute < 0 || minute > 59 ||
+        second < 0 || second > 59 
       ){
         alert('時間格式錯誤，必須符合(24小時制)時分秒');
         return;
@@ -278,23 +246,23 @@
       alert('交易編號字數超過上限');
       return;
     }
-    let form = document.createElement('form');
+    const form = document.createElement('form');
     form.setAttribute('method', 'POST');
     form.setAttribute('action', 'https://uat-fps.ctbcins.com/ap2ap/remit');
 
-    let msgIDField = document.createElement('input');
+    const msgIDField = document.createElement('input');
     msgIDField.setAttribute('type', 'hidden');
     msgIDField.setAttribute('name', 'MsgID');
     msgIDField.setAttribute('value', '2');
     form.appendChild(msgIDField);
 
-    let transactionNoField = document.createElement('input');
+    const transactionNoField = document.createElement('input');
     transactionNoField.setAttribute('type', 'hidden');
     transactionNoField.setAttribute('name', 'TransactionNo');
     transactionNoField.setAttribute('value', transactionNo.value);
     form.appendChild(transactionNoField);
 
-    let bodyField = document.createElement('input');
+    const bodyField = document.createElement('input');
     bodyField.setAttribute('type', 'hidden');
     bodyField.setAttribute('name', 'body');
     bodyField.setAttribute('value', concatenatedData);

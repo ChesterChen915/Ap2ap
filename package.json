@@ -9,9 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dayjs": "^1.11.10",
+    "lodash": "^4.17.21",
     "vue": "^3.4.21"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "vite": "^5.1.6"
   }
