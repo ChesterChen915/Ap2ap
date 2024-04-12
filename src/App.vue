@@ -6,7 +6,7 @@
   const content = ref({
     accountNoReceive:"163540120484",
     accountType:"2",
-    accountDate:"1130205",  //日期
+    accountDate:"",  //日期
     memo1:"",  //虛擬繳款帳號扣掉開頭43824
     transactionAmount:"",  //費用
     transactionDate:"",  //日期
@@ -27,8 +27,17 @@
     remittanceMemo: "                                                                                "  //80bytes   
   });
 
-  const date = ref("");
-  const time = ref("");
+  const now = new Date();
+  const currentYear = now.getFullYear().toString();
+  const rocYear = (parseInt(currentYear) - 1911).toString();
+  const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+  const currentDay = now.getDate().toString().padStart(2, '0');
+  const currentHour = now.getHours().toString().padStart(2, '0');
+  const currentMinute = now.getMinutes().toString().padStart(2, '0');
+  const currentSecond = now.getSeconds().toString().padStart(2, '0');
+
+  const date = ref(`${rocYear}${currentMonth}${currentDay}`);
+  const time = ref(`${currentHour}${currentMinute}${currentSecond}`);
   const amount = ref("");
   const account = ref("");
   const transactionNo = ref("");
@@ -133,6 +142,7 @@
     content.value.transactionDate = date.value;
     content.value.transactionTime = time.value;
     content.value.transactionAmount = amount.value.padStart(15, '0');
+    content.value.accountDate = date.value;
     content.value.companyCode = companyCodeMemo1.value.companyCode;
     content.value.memo1 = companyCodeMemo1.value.memo1 + '     ';
 
