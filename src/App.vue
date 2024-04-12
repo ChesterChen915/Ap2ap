@@ -59,7 +59,7 @@
       const daysInMonth = new Date(year + 1911, month, 0).getDate();
       if (
         year < 1 || year > 999 ||
-        month < 1 || month > 12||
+        month < 1 || month > 12 ||
         day < 1 || day > daysInMonth ||
         (month === 2 && day > 29 && (year % 4 === 0 && (year % 100 !== 0 || year % 400 ===0)))
       ){
@@ -118,18 +118,6 @@
     }
   }, 1000);
 
-  const handlerTransactionNoInput = debounce(function (event){
-    const transactionNoInputValue = event.target.value;
-    if (!/^\d*$/.test(transactionNoInputValue)) {  //若輸入的不是數字就不處理
-      event.target.value = "";
-      return;
-    }
-    if (transactionNoInputValue.length > 17) {
-      alert('交易編號格式錯誤，最多為十七位數字');
-      return;
-    }
-  }, 1000);
-
   const companyCodeMemo1 = computed(() => {
     const accountValue = account.value || "";
     return {
@@ -137,6 +125,14 @@
       memo1: accountValue.substring(5)
     };
   });
+
+  const generateTransactionNo = function(){
+    const dateValue = date.value;
+    const timeValue = time.value;
+    const serialNumber = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+
+    return `000${dateValue}${timeValue}${serialNumber}`;
+  }
 
   const concatenateData = function() {
     content.value.transactionDate = date.value;
@@ -178,6 +174,9 @@
     console.log("串接完的字串:", concatenatedData);
     console.log(concatenatedData.length);
 
+    const newTransactionNo = generateTransactionNo();
+    transactionNo.value = newTransactionNo;
+
     sendData(concatenatedData);
   }
 
@@ -198,7 +197,7 @@
       const daysInMonth = new Date(year + 1911, month, 0).getDate();
       if (
         year < 1 || year > 999 ||
-        month < 1 || month > 12||
+        month < 1 || month > 12 ||
         day < 1 || day > daysInMonth ||
         (month === 2 && day > 29 && (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)))
       ){
@@ -248,17 +247,9 @@
       return;
     }
 
-    if (!transactionNo.value) {
-      alert('交易編號欄位為必填');
-      return;
-    }
-    if (transactionNo.value.length > 17) {
-      alert('交易編號字數超過上限');
-      return;
-    }
     const form = document.createElement('form');
     form.setAttribute('method', 'POST');
-    form.setAttribute('action', 'https://uat-fps.ctbcins.com:8443/ap2ap/remit');
+    form.setAttribute('action', content.value.action);
 
     const msgIDField = document.createElement('input');
     msgIDField.setAttribute('type', 'hidden');
@@ -284,11 +275,20 @@
     console.log(transactionNo.value);
     console.log(concatenatedData);
   }
+
+  const editUrl = () => {
+    const newUrl = prompt('請輸入新的URL:', 'https://uat-fps.ctbcins.com:8443/ap2ap/remit');
+    if (newUrl !== null){
+      content.value.action = newUrl;
+      console.log(content.value.action);
+    }
+  };
 </script>
 
 <template>
   <div class="container">
     <div class="headline">Ap2Ap測試</div>
+    <button class="edit-button" @click="editUrl">Edit</button>
     <div class="form">
       <div class="form-group">
         <label for="date">請輸入日期:</label>
@@ -305,10 +305,6 @@
       <div class="form-group">
         <label for="account">請輸入轉帳帳號:</label>
         <input id="account" type="text" v-model="account" @input="handlerAccountInput($event)" placeholder="ex:43824403202967" :placeholder="`${companyCodeMemo1.companyCode}${companyCodeMemo1.memo1}`">
-      </div>
-      <div class="form-group">
-        <label for="transactionNo">請輸入交易編號:</label>
-        <input id="transactionNo" type="text" v-model="transactionNo" @input="handlerTransactionNoInput($event)" placeholder="ex:00003761325031303">
       </div>
       <button @click="concatenateData">送出查詢</button>
     </div>
@@ -358,5 +354,4 @@
   button:hover {
     background-color: #0056b3;
   }
-
 </style>
