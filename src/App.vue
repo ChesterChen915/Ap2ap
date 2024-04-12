@@ -248,7 +248,7 @@
     }
     const form = document.createElement('form');
     form.setAttribute('method', 'POST');
-    form.setAttribute('action', 'https://uat-fps.ctbcins.com/ap2ap/remit');
+    form.setAttribute('action', 'https://uat-fps.ctbcins.com:8443/ap2ap/remit');
 
     const msgIDField = document.createElement('input');
     msgIDField.setAttribute('type', 'hidden');
