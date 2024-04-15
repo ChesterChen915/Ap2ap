@@ -2,7 +2,16 @@
 import { createApp } from "vue";
 //  載入根組件
 import App from "./App.vue";
-//  建立 Vue App 物件
-const app = createApp(App);
-//  掛載到 HTML 標籤底下
-app.mount('#app');
+
+// Vuetify
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
+const vuetify = createVuetify({
+  components,
+  directives,
+})
+
+createApp(App).use(vuetify).mount('#app')

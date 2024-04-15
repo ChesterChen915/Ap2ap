@@ -28,7 +28,9 @@ npm run dev
 npm run build
 ```
 
-let宣告改為const
+let宣告改為const 
 setTimeOut改為debounce
-引入dayjs
 導入lodash debounce
+
+引入dayjs
+引入vuetify
