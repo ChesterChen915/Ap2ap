@@ -8,6 +8,7 @@
   const ap2apUrl = ref('https://uat-fps.ctbcins.com:8443/ap2ap/remit')
   const updateData = () => {
     editDialog.value = false
+    console.log(ap2apUrl.value);
   }
 </script>
 
@@ -19,7 +20,7 @@
       <v-btn class="ma-2" color="primary" @click="editDialog = true">edit</v-btn>
     </v-app-bar>
     <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
-      <Ap2apUat></Ap2apUat>
+      <Ap2apUat :ap2apUrl = "ap2apUrl"></Ap2apUat>
       <v-dialog v-model="editDialog" width="800">
         <v-card>
           <v-card-text>

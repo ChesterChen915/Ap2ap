@@ -2,6 +2,9 @@
   import {ref, computed} from 'vue';
   import debounce from 'lodash/debounce';
 
+  const props = defineProps(['ap2apUrl']);
+  const ap2apUrl = ref(props.ap2apUrl);
+
   const content = ref({
     accountNoReceive:"163540120484",
     accountType:"2",
@@ -173,6 +176,8 @@
     console.log("串接完的字串:", concatenatedData);
     console.log(concatenatedData.length);
 
+    console.log(props.ap2apUrl);
+
     const newTransactionNo = generateTransactionNo();
     transactionNo.value = newTransactionNo;
 
@@ -248,7 +253,7 @@
 
     const form = document.createElement('form');
     form.setAttribute('method', 'POST');
-    form.setAttribute('action', 'https://uat-fps.ctbcins.com:8443/ap2ap/remit');
+    form.setAttribute('action', props.ap2apUrl);
 
     const msgIDField = document.createElement('input');
     msgIDField.setAttribute('type', 'hidden');
