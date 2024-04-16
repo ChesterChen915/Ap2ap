@@ -283,7 +283,7 @@
 
 <template>
     <div class="flex-column mb-3">
-        <v-img src="src/assets/ctbc_icon.png" :width="300" aspect-ratio="16/9" cover></v-img>
+        <v-img src="/ctbc_icon.png" :width="300" aspect-ratio="16/9" cover></v-img>
         <v-sheet width="300" class="mx-auto">
           <v-form class="form" @submit.prevent>
               <v-form class="form-group">
