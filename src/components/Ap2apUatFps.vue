@@ -3,7 +3,7 @@
   import debounce from 'lodash/debounce';
 
   const props = defineProps(['ap2apUrl']);
-  const ap2apUrl = ref(props.ap2apUrl);
+  //const ap2apUrl = ref(props.ap2apUrl);
 
   const content = ref({
     accountNoReceive:"163540120484",
@@ -46,10 +46,6 @@
 
   const handlerDateInput = debounce(function (event){
     const dateInputValue = event.target.value;
-    if (!/^\d*$/.test(dateInputValue)) {  //若輸入的不是數字就不處理
-      event.target.value = "";
-      return;
-    } 
     if (dateInputValue.length > 7) {
       alert('日期格式錯誤，最多為七位數字，且必須符合民國(年月日)的格式');
       return;
@@ -73,10 +69,6 @@
   
   const handlerTimeInput = debounce(function (event){
     const timeInputValue = event.target.value;
-    if (!/^\d*$/.test(timeInputValue)) {  //若輸入的不是數字就不處理
-      event.target.value = "";
-      return;
-    }
     if (timeInputValue.length > 6) {
       alert('時間格式錯誤，最多為六位數字，且必須符合24小時制(時分秒)的格式');
       return;
@@ -98,10 +90,6 @@
 
   const handlerAmountInput = debounce(function (event){
     const amountInputValue = event.target.value;
-    if (!/^\d*$/.test(amountInputValue)) {  //若輸入的不是數字就不處理
-      event.target.value = "";
-      return;
-    }
     if (amountInputValue.length > 15){
       alert('超過轉帳金額上限');
       return;
@@ -110,10 +98,6 @@
 
   const handlerAccountInput = debounce(function (event){
     const accountInputValue = event.target.value;
-    if (!/^\d*$/.test(accountInputValue)) {  //若輸入的不是數字就不處理
-      event.target.value = "";
-      return;
-    }
     if (accountInputValue.length > 14){
       alert('轉帳帳號格式錯誤，輸入之前五碼需為企業識別碼，後九碼需為虛擬繳款帳號')
       return;
@@ -139,7 +123,8 @@
   const concatenateData = function() {
     content.value.transactionDate = date.value;
     content.value.transactionTime = time.value;
-    content.value.transactionAmount = amount.value.padStart(15, '0');
+    const amountValue = parseInt(amount.value);
+    content.value.transactionAmount = (amountValue * 100).toString().padStart(15, '0');
     content.value.accountDate = date.value;
     content.value.companyCode = companyCodeMemo1.value.companyCode;
     content.value.memo1 = companyCodeMemo1.value.memo1 + '     ';
@@ -189,6 +174,10 @@
       alert('日期欄位為必填');
       return;
     }
+    if (!/^\d+$/.test(date.value)) {
+      alert('日期格式錯誤，只能包含數字');
+      return;
+    }
     const dateValue = parseInt(date.value);
     if (isNaN(dateValue) || date.value.length !== 7) {
       alert('日期格式錯誤，需為七位數字，且必須符合民國(年月日)的格式');
@@ -214,6 +203,10 @@
       alert('時間欄位為必填');
       return;
     }
+    if (!/^\d+$/.test(time.value)) {
+      alert('時間格式錯誤，只能包含數字');
+      return;
+    }
     const timeValue = parseInt(time.value);
     if (isNaN(timeValue) || time.value.length !== 6) {
       alert('時間格式錯誤，需為六位數字，且必須符合24小時制(時分秒)的格式');
@@ -237,13 +230,21 @@
       alert('轉帳金額欄位為必填');
       return;
     }
+    if (!/^\d+$/.test(amount.value)) {
+      alert('轉帳金額格式不正確，只能包含數字');
+      return;
+    }
     if (content.value.transactionAmount.length !== 15) {
-      alert('轉帳金額格式不正確');
+      alert('轉帳金額格式不正確，超過位數上限');
       return;
     }
 
     if (!account.value) {
       alert('轉帳帳號欄位為必填');
+      return;
+    }
+    if (!/^\d+$/.test(account.value)) {
+      alert('轉帳帳號格式錯誤，只能包含數字');
       return;
     }
     if (account.value.length !== 14) {
@@ -303,7 +304,7 @@
                 <v-text-field id="account" type="text" v-model="account" @input="handlerAccountInput($event)" placeholder="ex:43824403202967" 
                             :placeholder="`${companyCodeMemo1.companyCode}${companyCodeMemo1.memo1}`"></v-text-field>
               </v-form>
-              <v-btn type="submit" block class="mt-2" @click="concatenateData">送出查詢</v-btn>
+              <v-btn type="submit" block class="mt-2" @click="concatenateData">轉帳測試</v-btn>
           </v-form>
         </v-sheet>
     </div>
